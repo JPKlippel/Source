@@ -1,0 +1,115 @@
+using System;
+
+
+class Program
+{
+    static void Main()
+    {
+        var pessoa = new Extrato("Joao Pedro Klippel");
+
+        pessoa.AdicionarRegistro(new Registro(DateTime.Now.AddDays(-2), 100.50m, TipoRegistro.Deposito));
+        pessoa.AdicionarRegistro(new Registro(DateTime.Now.AddDays(-1), 89.50m, TipoRegistro.Saque));
+        pessoa.AdicionarRegistro(new Registro(DateTime.Now, 90.50m, TipoRegistro.Deposito));
+
+        pessoa.ExibirExtrato();
+        decimal saldoPessoa = pessoa.CalculaSaldo();
+        Console.WriteLine($"Saldo de {pessoa.Nome} : R${saldoPessoa}\n");
+
+        //pessoa.ExibirExtrato();
+
+        var saldoDiario = pessoa.GerarSaldoDiario();
+        foreach (var saldo in saldoDiario)
+        {
+            Console.WriteLine(saldo);
+        }
+
+
+    }
+
+    public enum TipoRegistro
+    {
+        Deposito,
+        Saque
+    }
+    class Registro
+    {
+        public DateTime Data { get; set;}
+        public decimal Valor { get; set;}
+        public TipoRegistro Tipo { get; set; }
+        public Registro(DateTime data, decimal valor, TipoRegistro tipo)
+        {
+            Data = data;
+            Valor = valor;
+            Tipo = tipo;
+        }
+    }
+
+    class Extrato
+    {
+        public string Nome { get; }
+        public List<Registro> Registros { get; set; }
+
+        public Extrato(string nome)
+        {
+            Nome = nome;
+            Registros = new List<Registro>();
+        }
+
+        public void AdicionarRegistro(Registro registro)
+        {
+            Registros.Add(registro);
+        }
+        
+        
+        public void ExibirExtrato()
+        {
+            Console.WriteLine($"Extrato - {Nome}");
+            Console.WriteLine("Data\t\tValor\t\tTipo");
+
+            foreach (var registro in Registros)
+            {
+                Console.WriteLine($"{registro.Data.ToShortDateString()}\t{registro.Valor}\t\t{registro.Tipo}");
+            }
+        }
+
+        public decimal CalculaSaldo()
+        {
+            decimal saldo = 0;
+
+            foreach (var registro in Registros)
+            {
+                if(registro.Tipo == TipoRegistro.Saque)
+                    saldo -= registro.Valor;
+                else if (registro.Tipo == TipoRegistro.Deposito)
+                    saldo += registro.Valor;
+            }
+
+            return saldo;
+        }
+
+        public List<string> GerarSaldoDiario()
+        {
+            var saldoDiario = new List<string>();
+            var registrosPorData = Registros.GroupBy(r => r.Data.Date)
+                                            .OrderBy(grupo => grupo.Key); 
+            decimal saldoAcumulado = 0;
+
+            foreach (var grupo in registrosPorData)
+            {
+                foreach (var registro in grupo)
+                {
+                    if (registro.Tipo == TipoRegistro.Saque)
+                        saldoAcumulado -= registro.Valor;
+                    else if (registro.Tipo == TipoRegistro.Deposito)
+                        saldoAcumulado += registro.Valor;
+                }
+
+               
+                saldoDiario.Add($"{grupo.Key.ToShortDateString()} - Saldo: R${saldoAcumulado:F2}");
+            }
+
+            return saldoDiario;
+        }
+
+    }
+}
