@@ -113,3 +113,131 @@ class Program
 
     }
 }
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+
+class Program
+{
+    static void Main()
+    {
+        var contaJoao = new ContaCorrente("Joao Pedro Klippel", 150.50m);
+        contaJoao.MostraConta();
+
+        int flag = 0, opr;
+        decimal valor;
+
+        /*contaJoao.Depositar(90.00m);
+        contaJoao.MostraConta();
+
+        contaJoao.Saque(220.50m);
+        contaJoao.MostraConta();
+
+        contaJoao.Saque(20.50m);*/
+
+        do
+        {
+            ImprimeMenu();
+            try 
+            {
+                opr = int.Parse(Console.ReadLine());
+            }
+            catch
+            {
+                Console.WriteLine("Comando Inválido");
+                continue;
+            }
+
+            switch(opr)
+            {
+                case 0:
+                    flag = 1;
+                    break;
+                case 1:
+                    valor = RetornaValor();
+                    contaJoao.Depositar(valor);
+                    break;
+                case 2:
+                    valor = RetornaValor();
+                    contaJoao.Saque(valor);  
+                    break;
+                default:
+                    Console.WriteLine("Comando Inválido");
+                    break;
+            }
+
+        } while (flag != 1);
+
+
+    }
+
+
+    public class ContaCorrente
+    {
+        // Saldo é uma característica
+        public decimal saldo { get; set; }
+        // representa a pessoa que é proprietária desta conta
+        public string nome {  get; set; }
+
+        public ContaCorrente(string Nome, decimal Saldo)
+        {
+            saldo = Saldo;
+            nome = Nome;  
+        }
+
+        // Depositar é uma ação
+        public void Depositar(decimal valor)
+        {
+            saldo += valor;
+            Console.WriteLine($"Depósito de R${valor} Realizado com Sucesso");
+            Console.WriteLine($"Saldo Atual : R${saldo}");
+        }
+
+        // Sacar é uma ação
+        public void Saque(decimal valor)
+        {
+            if (valor > saldo)
+            {
+                Console.WriteLine("Saldo Insuficiente para Saque");
+            }
+            else
+            {
+                saldo -= valor;
+                Console.WriteLine($"Saque de R${valor} Realizado com Sucesso");
+                Console.WriteLine($"Saldo Atual : R${saldo}");
+            }
+        }
+
+        public void MostraConta()
+        {
+            Console.WriteLine(
+                $"---------------------------------------\n" +
+                $"Titular da conta: {nome}\n" +
+                $"Saldo da conta: R${saldo}\n" +
+                $"---------------------------------------");
+        }
+
+    }
+
+    public static void ImprimeMenu()
+    {
+        Console.WriteLine(
+            "-------------------\n" +
+            "0 - Sair\n" +
+            "1 - Depositar\n" +
+            "2 - Sacar\n" +
+            "-------------------");
+    }
+
+    public static decimal RetornaValor()
+    {
+        Console.Write("Digite o valor: R$");
+        decimal valor = Convert.ToDecimal(Console.ReadLine());
+        return valor;
+    }
+}
